@@ -116,6 +116,8 @@ export default function VideoDownloader() {
       // Convert response to blob and trigger download
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
+      
+      // Trigger download
       const link = document.createElement('a');
       link.href = blobUrl;
       link.download = filename;
@@ -123,8 +125,8 @@ export default function VideoDownloader() {
       link.click();
       document.body.removeChild(link);
       
-      // Clean up blob URL
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
+      // Clean up blob URL after some time
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
 
     } catch (err: any) {
       setError(err.message || 'Failed to download video');
@@ -158,7 +160,7 @@ export default function VideoDownloader() {
               YouTube
             </Badge>
             <Badge variant="secondary" className="bg-cyan-600/20 text-cyan-300 border-cyan-500/50">
-              TikTok (Coming Soon)
+              TikTok
             </Badge>
           </div>
         </div>
