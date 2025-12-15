@@ -31,6 +31,8 @@ export async function POST(request: NextRequest) {
 
     if (platform === 'youtube') {
       return await handleYouTubeDownload(url, quality, format);
+    } else if (platform === 'tiktok') {
+      return await handleTikTokDownload(url);
     }
 
     return NextResponse.json(
@@ -167,5 +169,48 @@ function cleanupTempFiles(tmpFilePath: string): void {
     });
   } catch (error) {
     console.warn('Failed to cleanup temp files:', error);
+  }
+}
+
+async function handleTikTokDownload(url: string): Promise<NextResponse> {
+  const escapedUrl = escapeUrl(url);
+  
+  // Create temporary file path
+  const tmpDir = os.tmpdir();
+  const tmpFilePath = path.join(tmpDir, `tiktok_${Date.now()}.mp4`);
+
+  try {
+    // Get video title
+    const filename = await getVideoTitle(url);
+
+    // TikTok videos are usually already in compatible format, download directly
+    console.log('Downloading TikTok video...');
+    const downloadCmd = `${YT_DLP_PATH} --no-warnings -o "${tmpFilePath}" "${escapedUrl}"`;
+    
+    await execAsync(downloadCmd, {
+      maxBuffer: BUFFER_SIZE,
+      timeout: TIMEOUTS.DOWNLOAD
+    });
+
+    console.log('TikTok download completed');
+
+    // Find and read the downloaded file
+    const finalFilePath = await findDownloadedFile(tmpFilePath);
+    const videoBuffer = fs.readFileSync(finalFilePath);
+
+    // Clean up temp files
+    cleanupTempFiles(tmpFilePath);
+
+    return new NextResponse(videoBuffer, {
+      headers: {
+        'Content-Disposition': `attachment; filename="${filename}"`,
+        'Content-Type': 'video/mp4',
+        'Content-Length': videoBuffer.length.toString(),
+      },
+    });
+  } catch (error: any) {
+    cleanupTempFiles(tmpFilePath);
+    console.error('TikTok download error:', error);
+    throw new Error(error.message || 'Failed to download TikTok video.');
   }
 }

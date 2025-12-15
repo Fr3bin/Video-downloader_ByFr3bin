@@ -15,9 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Fr3_vid_downloader",
   description: "Fast and easy YouTube video downloader with QuickTime compatibility",
-  icons: {
-    icon: '/favicon.png',
-  },
 };
 
 export default function RootLayout({

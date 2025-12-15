@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { detectPlatform, escapeUrl, formatDuration } from '@/lib/video-utils';
+import { getTikTokInfo } from '@/lib/tiktok-utils';
 import { YT_DLP_PATH, TIMEOUTS, QUALITY_OPTIONS } from '@/lib/constants';
 import { VideoInfo, VideoInfoRequest } from '@/lib/types';
 
@@ -80,7 +81,4 @@ async function getYouTubeInfo(url: string): Promise<VideoInfo> {
   }
 }
 
-async function getTikTokInfo(url: string): Promise<VideoInfo> {
-  // TikTok support placeholder
-  throw new Error('TikTok support is coming soon!');
-}
+// getTikTokInfo is now imported from @/lib/tiktok-utils
